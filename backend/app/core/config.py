@@ -5,6 +5,9 @@ class Settings(BaseSettings):
     app_name: str = "AI Technical Support Resolution Assistant"
     app_version: str = "1.0.0"
     environment: str = "development"
+    mongodb_uri: str
+    jwt_secret_key: str
+    jwt_algorithm: str = "HS256"
 
     model_config = SettingsConfigDict(
         env_file=".env",

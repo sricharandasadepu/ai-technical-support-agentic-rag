@@ -1,20 +1,38 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
 from app.core.config import settings
+from app.db.mongodb import mongodb
+from app.routers.auth import router as auth_router
+
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Application startup
+    await mongodb.connect()
+
+    yield
+
+    # Application shutdown
+    await mongodb.close()
 
 
 app = FastAPI(
-    title="AI Technical Support Resolution Assistant",
+    title=settings.app_name,
+    version=settings.app_version,
     description="Agentic RAG application for technical support resolution.",
-    version="1.0.0"
+    lifespan=lifespan
 )
 
+
 @app.get("/health")
-async def health():
-    """
-    Check whether the API is running.
-    """
+def health_check():
     return {
         "status": "success",
         "message": "API is running",
         "environment": settings.environment
     }
+
+app.include_router(auth_router)
