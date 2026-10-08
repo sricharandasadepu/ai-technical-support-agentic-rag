@@ -6,3 +6,10 @@ pymongo>=4.13
 email-validator
 pwdlib[argon2]
 PyJWT
+azure-storage-blob
+azure-core
+langchain-core
+pymupdf
+python-docx
+langchain-text-splitters
+sentence-transformers

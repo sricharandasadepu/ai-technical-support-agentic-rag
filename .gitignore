@@ -1,2 +1,14 @@
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Environment and secrets
 .env
 .env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.pyc
+
+test_azure.py

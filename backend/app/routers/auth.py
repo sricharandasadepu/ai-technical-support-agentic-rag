@@ -46,3 +46,4 @@ async def get_me(
         "name": current_user["name"],
         "email": current_user["email"]
     }
+
