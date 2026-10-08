@@ -16,3 +16,4 @@ sentence-transformers
 numpy
 pinecone
 rank-bm25
+langchain-groq

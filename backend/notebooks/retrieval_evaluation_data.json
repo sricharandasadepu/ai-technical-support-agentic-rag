@@ -1,0 +1,636 @@
+{
+  "queries": [
+    {
+      "query_id": "Q1",
+      "query": "How do I fix NX-AUTH-4017?"
+    },
+    {
+      "query_id": "Q2",
+      "query": "Why does login fail after a server restore?"
+    },
+    {
+      "query_id": "Q3",
+      "query": "How can I resolve API rate limiting and HTTP 429 errors?"
+    },
+    {
+      "query_id": "Q4",
+      "query": "Why are webhook deliveries failing with HTTP 503?"
+    },
+    {
+      "query_id": "Q5",
+      "query": "How do I fix an SSO audience mismatch?"
+    },
+    {
+      "query_id": "Q6",
+      "query": "What should I do when OAuth tokens are rejected after a host patch?"
+    },
+    {
+      "query_id": "Q7",
+      "query": "How do I troubleshoot duplicate support ticket notifications?"
+    },
+    {
+      "query_id": "Q8",
+      "query": "What should I check when API requests are being throttled?"
+    },
+    {
+      "query_id": "Q9",
+      "query": "How do I resolve NX-AUTH-4020?"
+    },
+    {
+      "query_id": "Q10",
+      "query": "What are the recommended steps for troubleshooting webhook delivery failures?"
+    }
+  ],
+  "chunks": [
+    {
+      "chunk_number": 1,
+      "chunk_id": "967f29f71425e2767a41f5a1ab68a7b1e0e0573964d559f79bebb20ce0177970",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-AUTH-4017",
+        "topic": "authentication",
+        "chunk_id": "967f29f71425e2767a41f5a1ab68a7b1e0e0573964d559f79bebb20ce0177970"
+      },
+      "text": "Error Code: NX-AUTH-4017\nTitle: OAuth token rejected due to clock skew\nSymptoms: HTTP 401 despite a token that appears valid; Login failures after VM migration, restore, or host patch\nResolution: Synchronize the application host using NTP, verify time, and restart the authentication worker."
+    },
+    {
+      "chunk_number": 2,
+      "chunk_id": "31dfcc4b1bbb8295f7a7f4b514f21b95d98d3ea824235b4e515bf7794951fb63",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-API-4292",
+        "topic": "api",
+        "chunk_id": "31dfcc4b1bbb8295f7a7f4b514f21b95d98d3ea824235b4e515bf7794951fb63"
+      },
+      "text": "Error Code: NX-API-4292\nTitle: Tenant API burst rate exceeded\nSymptoms: HTTP 429; Intermittent throttling during batch or concurrent requests\nResolution: Reduce concurrency, honor Retry-After, and use exponential backoff with jitter."
+    },
+    {
+      "chunk_number": 3,
+      "chunk_id": "4c05cab3d15f326cfcc9cf49395b642e801f7bb33333784af4bde336bcd4645b",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-WEBHOOK-5031",
+        "topic": "webhooks",
+        "chunk_id": "4c05cab3d15f326cfcc9cf49395b642e801f7bb33333784af4bde336bcd4645b"
+      },
+      "text": "Error Code: NX-WEBHOOK-5031\nTitle: Webhook destination unavailable\nSymptoms: Webhook delivery receives HTTP 503; Events remain pending while retries occur\nResolution: Verify destination availability, DNS, TLS, and firewall. Allow retry processing after recovery."
+    },
+    {
+      "chunk_number": 4,
+      "chunk_id": "2a3458da77f97c2b8b5107323ea02e7ed82e2ac1d982f00922b33d64f37e785c",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-NOTIFY-2204",
+        "topic": "notifications",
+        "chunk_id": "2a3458da77f97c2b8b5107323ea02e7ed82e2ac1d982f00922b33d64f37e785c"
+      },
+      "text": "Error Code: NX-NOTIFY-2204\nTitle: Duplicate ticket notification rule match\nSymptoms: Same user receives duplicate email for one ticket event\nResolution: Inspect matching rules and subscriptions; remove the redundant trigger and run a controlled test."
+    },
+    {
+      "chunk_number": 5,
+      "chunk_id": "13982e8ac2932ffc35e43a291df09b50cf93aa4f0a51e9bb78fa7ce8b1a0c88d",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-SEARCH-3108",
+        "topic": "search",
+        "chunk_id": "13982e8ac2932ffc35e43a291df09b50cf93aa4f0a51e9bb78fa7ce8b1a0c88d"
+      },
+      "text": "Error Code: NX-SEARCH-3108\nTitle: Search indexing backlog\nSymptoms: Recently created or updated tickets absent from search\nResolution: Inspect worker health and backlog; restart a failed worker before considering an index rebuild."
+    },
+    {
+      "chunk_number": 6,
+      "chunk_id": "a4d4a7da08f4bd510798292bfae42c29ffc81c0cd71d1edb60d8ae93eb14ecf2",
+      "metadata": {
+        "source": "faq/known_issues.json",
+        "document_type": "known_issue",
+        "error_code": "NX-AUTH-4020",
+        "topic": "authentication",
+        "chunk_id": "a4d4a7da08f4bd510798292bfae42c29ffc81c0cd71d1edb60d8ae93eb14ecf2"
+      },
+      "text": "Error Code: NX-AUTH-4020\nTitle: SSO audience mismatch\nSymptoms: SSO redirect loop; Assertion accepted by IdP but rejected by application\nResolution: Correct the audience value and clear stale sessions."
+    },
+    {
+      "chunk_number": 7,
+      "chunk_id": "ce2783086a710e8dbc8c272fa532dc1bc093480639666139e325fc82041d02aa",
+      "metadata": {
+        "source": "incidents/september_incident_report.txt",
+        "document_type": "incident_report",
+        "chunk_id": "ce2783086a710e8dbc8c272fa532dc1bc093480639666139e325fc82041d02aa"
+      },
+      "text": "NEXADESK CLOUD - SEPTEMBER 2026 INCIDENT REPORT\nIncident ID: INC-2026-09-06\nStatus: Resolved\nSynthetic training document\nSUMMARY\nOn 2026-09-06, outbound webhook processing was degraded for approximately 42 minutes. Queue depth increased across multiple tenants and some deliveries were delayed.\nCUSTOMER IMPACT\nWebhook events were accepted by NexaDesk but remained pending longer than normal. Some customer endpoints also returned HTTP 503 during the same period, which complicated initial diagnosis.\nROOT CAUSE\nA deployment caused outbound webhook workers to run with an unexpectedly low concurrency limit. This created queue saturation across multiple tenants.\nMITIGATION\nOperations increased worker capacity, rolled back the affected configuration, and monitored queue age until the backlog drained.\nDIAGNOSTIC GUIDANCE\nThis historical incident should not be assumed to explain every webhook 503. For a current case affecting one customer destination, first verify destination availability, DNS, TLS, firewall behavior, and response latency. Suspect a platform incident when queue growth and failures occur across multiple unrelated tenants.\nFOLLOW-UP\nAdded queue-depth alerts and administration visibility for webhook retry state."
+    },
+    {
+      "chunk_number": 8,
+      "chunk_id": "c4ce2d7b17adefb61f4b582a1ae61e59e8ad7afb18910a55b28639df5c8093e5",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 1,
+        "section_title": "1. OAuth Authentication",
+        "chunk_id": "c4ce2d7b17adefb61f4b582a1ae61e59e8ad7afb18910a55b28639df5c8093e5"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n1. OAuth Authentication\nNexaDesk validates OAuth access tokens against the configured identity provider. Tokens must contain the\nexpected issuer and audience claims and must be within the configured clock-skew tolerance. Authentication\nfailures normally return HTTP 401. For reliable authentication, application hosts and identity-provider\ninfrastructure should use synchronized time. The default supported clock-skew tolerance is five minutes. If\nserver time differs significantly, otherwise valid tokens can be rejected. Administrators should verify token\nexpiration, issuer, audience, and host time before rotating credentials."
+    },
+    {
+      "chunk_number": 9,
+      "chunk_id": "a74c0256ebae415d871a85b0362d74cc235597df0be9453dbbf5ca18c982ecca",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 2,
+        "section_title": "2. API Rate Limiting",
+        "chunk_id": "a74c0256ebae415d871a85b0362d74cc235597df0be9453dbbf5ca18c982ecca"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n2. API Rate Limiting\nNexaDesk protects tenant APIs with sustained and burst rate limits. In the 4.8 product family, the standard burst\nthreshold is 120 requests per minute per tenant unless a tenant-specific policy overrides it. Clients that receive\nHTTP 429 should reduce concurrency, respect Retry-After when present, and use exponential backoff with\njitter. Repeated immediate retries can extend throttling and increase load. API keys should not be regenerated\nas a first response to rate limiting because rate limits are based on tenant traffic policy rather than key validity."
+    },
+    {
+      "chunk_number": 10,
+      "chunk_id": "2bdd09eeefe2510aca76c9addd79ad6b086e169437b012e7856658f07660a872",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 3,
+        "section_title": "3. Webhook Delivery",
+        "chunk_id": "2bdd09eeefe2510aca76c9addd79ad6b086e169437b012e7856658f07660a872"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n3. Webhook Delivery\nOutbound webhooks are delivered asynchronously. NexaDesk treats HTTP 2xx responses as successful\ndelivery. HTTP 5xx responses, timeouts, DNS failures, and connection failures are retried according to the\ndelivery policy. For webhook delivery failures, verify endpoint availability, DNS resolution, TLS validity, firewall\nrules, and response latency. A destination returning HTTP 503 indicates that the destination is temporarily\nunavailable; inspect the endpoint before assuming an internal NexaDesk outage."
+    },
+    {
+      "chunk_number": 11,
+      "chunk_id": "cbb767deeb93653a2d3c8c706050e2e1c16aaee6093dd14c86360d9b7c3a6fed",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 4,
+        "section_title": "4. Ticket and Email Notifications",
+        "chunk_id": "cbb767deeb93653a2d3c8c706050e2e1c16aaee6093dd14c86360d9b7c3a6fed"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n4. Ticket and Email Notifications\nTicket notifications can be sent through email and in-product channels. Duplicate notifications can occur when\noverlapping notification rules target the same event or when an automation rule and a manual subscription both\ntrigger delivery. Administrators should inspect active notification rules, event subscriptions, and automation\nhistory. Disabling all notification services is not recommended because it can hide the configuration problem."
+    },
+    {
+      "chunk_number": 12,
+      "chunk_id": "30db09b1298f35ff7e24b4e2dde3835715e8c7616947a61d86616724d30b6032",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 5,
+        "section_title": "5. Search Index and Reporting",
+        "chunk_id": "30db09b1298f35ff7e24b4e2dde3835715e8c7616947a61d86616724d30b6032"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n5. Search Index and Reporting\nTicket search is backed by an asynchronous indexing pipeline. Recently created or updated tickets can briefly\nlag behind transactional data. Reporting jobs operate independently of ticket search and may use cached\naggregates. If search results are stale for an extended period, inspect indexing worker health and backlog\nbefore rebuilding an index."
+    },
+    {
+      "chunk_number": 13,
+      "chunk_id": "390505a70209ce92504e91eba1f2eb9835b0e91b282ec0deeb1876d294e91080",
+      "metadata": {
+        "source": "product_docs/nexadesk_admin_guide.pdf",
+        "document_type": "product_documentation",
+        "page": 1,
+        "section_number": 6,
+        "section_title": "6. SSO and Session Behavior",
+        "chunk_id": "390505a70209ce92504e91eba1f2eb9835b0e91b282ec0deeb1876d294e91080"
+      },
+      "text": "NexaDesk Cloud - Administrator and Integration Guide\nVersion family: 4.8.x | Synthetic training document\n\n6. SSO and Session Behavior\nSingle sign-on sessions depend on identity-provider assertions and NexaDesk session lifetime settings. A user\nrepeatedly redirected to login may have an invalid audience, expired assertion, blocked third-party cookie, or\nexcessive time difference between systems. Do not confuse SSO redirect loops with API token failures: both\ninvolve authentication, but their diagnostic paths differ."
+    },
+    {
+      "chunk_number": 14,
+      "chunk_id": "b211ef750502045f167b569d1dca8e50dbc5b35d3fd5f196cc73c4d510d6dbb8",
+      "metadata": {
+        "source": "release_notes/release_notes_v4_8.md",
+        "document_type": "release_notes",
+        "chunk_id": "b211ef750502045f167b569d1dca8e50dbc5b35d3fd5f196cc73c4d510d6dbb8"
+      },
+      "text": "# NexaDesk Cloud 4.8 Release Notes\nSynthetic product release notes for RAG experimentation.\n## 4.8.0 - API traffic controls\nNexaDesk 4.8 introduced per-tenant burst-rate enforcement. Standard tenants may receive HTTP 429 when traffic exceeds 120 requests per minute. Integrations should use exponential backoff, jitter, and `Retry-After` when available.\n## 4.8.1 - Authentication worker diagnostics\nAuthentication logging now records issuer, audience-validation result, and detected server-time offset. The supported clock-skew tolerance remains five minutes. A large time difference can cause valid OAuth tokens to be rejected.\n## 4.8.1 - Webhook retry visibility\nAdministrators can inspect webhook retry state and queue age. HTTP 503 from a destination continues to be treated as a retryable destination failure.\n## 4.8.1 - Notification rule editor\nThe rule editor now warns when two ticket notification rules appear to overlap. Existing duplicate rules are not automatically removed.\n## 4.8.1 - Search worker health\nSearch-index worker health and backlog depth are now visible in the administration diagnostics page.\n## Important distinction\nA webhook HTTP 503 does not by itself prove a NexaDesk platform incident. Check whether the failure affects one destination or many tenants before escalating."
+    },
+    {
+      "chunk_number": 15,
+      "chunk_id": "79fd8cb1d274a1572cbf2fe779bcc2f29737c5e9cdbd0b0656f0cec8398f547a",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1842",
+        "topic": "authentication",
+        "error_code": "NX-AUTH-4017",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "79fd8cb1d274a1572cbf2fe779bcc2f29737c5e9cdbd0b0656f0cec8398f547a"
+      },
+      "text": "Ticket ID: SUP-1842\nCustomer Issue: Users unable to login after VM migration\nError Code: NX-AUTH-4017\nProduct Version: 4.8.1\nRoot Cause: Application server clock was 7 minutes behind identity provider\nResolution: Enabled NTP synchronization and restarted authentication workers"
+    },
+    {
+      "chunk_number": 16,
+      "chunk_id": "2fcdd2f1fac2e8469978a871e536e15d2235fb1a46455e8c65487901b9aa8569",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1847",
+        "topic": "api",
+        "error_code": "NX-API-4292",
+        "status": "resolved",
+        "product_version": "4.8.0",
+        "chunk_id": "2fcdd2f1fac2e8469978a871e536e15d2235fb1a46455e8c65487901b9aa8569"
+      },
+      "text": "Ticket ID: SUP-1847\nCustomer Issue: Integration intermittently receives HTTP 429 after upgrade\nError Code: NX-API-4292\nProduct Version: 4.8.0\nRoot Cause: Client burst exceeded 120 requests/minute\nResolution: Reduced concurrency and added exponential backoff with jitter"
+    },
+    {
+      "chunk_number": 17,
+      "chunk_id": "ae5f44820b42417b9ac88b781d5f590b55a36ee87348d2c8f7b51c12037d539e",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1853",
+        "topic": "webhooks",
+        "error_code": "NX-WEBHOOK-5031",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "ae5f44820b42417b9ac88b781d5f590b55a36ee87348d2c8f7b51c12037d539e"
+      },
+      "text": "Ticket ID: SUP-1853\nCustomer Issue: Webhook events pending; destination responds 503\nError Code: NX-WEBHOOK-5031\nProduct Version: 4.8.1\nRoot Cause: Customer destination service unavailable for 18 minutes\nResolution: Restored destination service and allowed retry queue to drain"
+    },
+    {
+      "chunk_number": 18,
+      "chunk_id": "0ee77ae87d19178b5dc25fa398d3aef91aa58ae1a14e207e62eea5a3e6ce74e5",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1861",
+        "topic": "notifications",
+        "error_code": "NX-NOTIFY-2204",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "0ee77ae87d19178b5dc25fa398d3aef91aa58ae1a14e207e62eea5a3e6ce74e5"
+      },
+      "text": "Ticket ID: SUP-1861\nCustomer Issue: Customers receive duplicate ticket emails\nError Code: NX-NOTIFY-2204\nProduct Version: 4.8.1\nRoot Cause: Two overlapping notification rules matched ticket.created\nResolution: Disabled duplicate rule and validated with controlled ticket"
+    },
+    {
+      "chunk_number": 19,
+      "chunk_id": "52e45daf7410df69e9e6bfea4b5c2a578375d37c1e15cf3864ddd2718330b87a",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1868",
+        "topic": "search",
+        "error_code": "NX-SEARCH-3108",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "52e45daf7410df69e9e6bfea4b5c2a578375d37c1e15cf3864ddd2718330b87a"
+      },
+      "text": "Ticket ID: SUP-1868\nCustomer Issue: New tickets missing from search for over 20 minutes\nError Code: NX-SEARCH-3108\nProduct Version: 4.8.1\nRoot Cause: Indexing worker stalled with backlog\nResolution: Restarted indexing worker; backlog drained"
+    },
+    {
+      "chunk_number": 20,
+      "chunk_id": "e1701724e4ffe89e01c6c239fdb693dc759d0cdbc722bc961996898dea7f0df5",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1874",
+        "topic": "authentication",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "e1701724e4ffe89e01c6c239fdb693dc759d0cdbc722bc961996898dea7f0df5"
+      },
+      "text": "Ticket ID: SUP-1874\nCustomer Issue: SSO users repeatedly redirected to login\nProduct Version: 4.8.1\nRoot Cause: Identity provider audience value did not match NexaDesk SSO configuration\nResolution: Corrected audience configuration and cleared stale sessions"
+    },
+    {
+      "chunk_number": 21,
+      "chunk_id": "96df8be49b263d146b76b490d332a8923f982403a93e0ad2394dfe9ba2ee1a19",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1880",
+        "topic": "webhooks",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "96df8be49b263d146b76b490d332a8923f982403a93e0ad2394dfe9ba2ee1a19"
+      },
+      "text": "Ticket ID: SUP-1880\nCustomer Issue: Webhook signatures rejected by customer after secret rotation\nProduct Version: 4.8.1\nRoot Cause: Customer validator still used previous signing secret\nResolution: Updated destination validator to new signing secret"
+    },
+    {
+      "chunk_number": 22,
+      "chunk_id": "789436153cb96ed0818a0f17bcf0d7c04250faf72d2a8f5d40326b8ebcf0d457",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1889",
+        "topic": "api",
+        "error_code": "NX-API-4292",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "789436153cb96ed0818a0f17bcf0d7c04250faf72d2a8f5d40326b8ebcf0d457"
+      },
+      "text": "Ticket ID: SUP-1889\nCustomer Issue: Batch integration slowed by throttling\nError Code: NX-API-4292\nProduct Version: 4.8.1\nRoot Cause: Eight workers retried immediately after every 429\nResolution: Implemented Retry-After handling and capped concurrency"
+    },
+    {
+      "chunk_number": 23,
+      "chunk_id": "5033358c53b92afc3d11d197dacdb1b09df6384453779919574dfa9422cc761c",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1896",
+        "topic": "notifications",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "5033358c53b92afc3d11d197dacdb1b09df6384453779919574dfa9422cc761c"
+      },
+      "text": "Ticket ID: SUP-1896\nCustomer Issue: One agent receives two assignment emails\nProduct Version: 4.8.1\nRoot Cause: Agent had manual subscription plus team automation subscription\nResolution: Removed redundant manual subscription"
+    },
+    {
+      "chunk_number": 24,
+      "chunk_id": "977cbea51f51d48aeaeecd991c5ab05f6cae8329dcfbb3a2af21ac04bb5d1b15",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1904",
+        "topic": "webhooks",
+        "error_code": "NX-WEBHOOK-5031",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "977cbea51f51d48aeaeecd991c5ab05f6cae8329dcfbb3a2af21ac04bb5d1b15"
+      },
+      "text": "Ticket ID: SUP-1904\nCustomer Issue: All webhook deliveries to one customer fail\nError Code: NX-WEBHOOK-5031\nProduct Version: 4.8.1\nRoot Cause: Customer endpoint returned 503 during maintenance\nResolution: Customer completed maintenance; retries succeeded"
+    },
+    {
+      "chunk_number": 25,
+      "chunk_id": "c363653cc3b5c8398ad615e60f5110ec1aa2b399f005e4e31af7f2180666483f",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1910",
+        "topic": "authentication",
+        "error_code": "NX-AUTH-4017",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "c363653cc3b5c8398ad615e60f5110ec1aa2b399f005e4e31af7f2180666483f"
+      },
+      "text": "Ticket ID: SUP-1910\nCustomer Issue: OAuth tokens valid at IdP but rejected by NexaDesk\nError Code: NX-AUTH-4017\nProduct Version: 4.8.1\nRoot Cause: NTP service disabled after host patch; clock drift exceeded tolerance\nResolution: Re-enabled NTP and restarted authentication worker"
+    },
+    {
+      "chunk_number": 26,
+      "chunk_id": "3628c822b2ae13409e85a81fc2810fd28f19d47dafb22ac8250b8d1255416ab7",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1918",
+        "topic": "search",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "3628c822b2ae13409e85a81fc2810fd28f19d47dafb22ac8250b8d1255416ab7"
+      },
+      "text": "Ticket ID: SUP-1918\nCustomer Issue: Search results lag behind ticket updates\nProduct Version: 4.8.1\nRoot Cause: Index backlog caused by worker memory pressure\nResolution: Restarted worker and increased memory limit"
+    },
+    {
+      "chunk_number": 27,
+      "chunk_id": "f02bc670468c1f8375d9b1f487c9077af2209720077c5296c33d0bd1f5bd6fb6",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1923",
+        "topic": "webhooks",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "f02bc670468c1f8375d9b1f487c9077af2209720077c5296c33d0bd1f5bd6fb6"
+      },
+      "text": "Ticket ID: SUP-1923\nCustomer Issue: Webhook queue growing across multiple tenants\nProduct Version: 4.8.1\nRoot Cause: Outbound workers were saturated during platform incident\nResolution: Scaled workers and drained queue after incident mitigation"
+    },
+    {
+      "chunk_number": 28,
+      "chunk_id": "be8034f900ef26175c621d64c450d031d13efdf4cc7f99d58472511f8e2def80",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1930",
+        "topic": "api",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "be8034f900ef26175c621d64c450d031d13efdf4cc7f99d58472511f8e2def80"
+      },
+      "text": "Ticket ID: SUP-1930\nCustomer Issue: API returns 401, not 429\nProduct Version: 4.8.1\nRoot Cause: Expired API credential\nResolution: Issued replacement credential and updated integration"
+    },
+    {
+      "chunk_number": 29,
+      "chunk_id": "331e02bcdee0942b2cb17a0bea421ea869d37bb3e2207acba2b305ab535c9298",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1938",
+        "topic": "notifications",
+        "error_code": "NX-NOTIFY-2204",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "331e02bcdee0942b2cb17a0bea421ea869d37bb3e2207acba2b305ab535c9298"
+      },
+      "text": "Ticket ID: SUP-1938\nCustomer Issue: Duplicate email after workflow edit\nError Code: NX-NOTIFY-2204\nProduct Version: 4.8.1\nRoot Cause: New automation duplicated existing ticket.updated rule\nResolution: Removed overlapping workflow action"
+    },
+    {
+      "chunk_number": 30,
+      "chunk_id": "1934b29b6780efd2b9f8146bcb59ae5d3ad0b32d390165891cac8b49ff2773f6",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1945",
+        "topic": "authentication",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "1934b29b6780efd2b9f8146bcb59ae5d3ad0b32d390165891cac8b49ff2773f6"
+      },
+      "text": "Ticket ID: SUP-1945\nCustomer Issue: OAuth login fails only for one client\nProduct Version: 4.8.1\nRoot Cause: Incorrect audience claim in client token\nResolution: Updated client OAuth audience"
+    },
+    {
+      "chunk_number": 31,
+      "chunk_id": "36a7d084b49ce4a30f64933da26a8bb5565c30e377d76f02e773a7392f3b5c35",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1951",
+        "topic": "webhooks",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "36a7d084b49ce4a30f64933da26a8bb5565c30e377d76f02e773a7392f3b5c35"
+      },
+      "text": "Ticket ID: SUP-1951\nCustomer Issue: Webhook timeout but endpoint eventually processes event\nProduct Version: 4.8.1\nRoot Cause: Endpoint response exceeded delivery timeout\nResolution: Customer changed handler to acknowledge quickly and process asynchronously"
+    },
+    {
+      "chunk_number": 32,
+      "chunk_id": "82e9d8fe2345e637ae489c516c8ac3032cc7fe1a21c7a9b918d76a2c5c72b70d",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1959",
+        "topic": "api",
+        "error_code": "NX-API-4292",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "82e9d8fe2345e637ae489c516c8ac3032cc7fe1a21c7a9b918d76a2c5c72b70d"
+      },
+      "text": "Ticket ID: SUP-1959\nCustomer Issue: 429 errors during nightly synchronization\nError Code: NX-API-4292\nProduct Version: 4.8.1\nRoot Cause: Nightly job sent a burst above tenant threshold\nResolution: Added batching, jitter, and exponential backoff"
+    },
+    {
+      "chunk_number": 33,
+      "chunk_id": "f6cadba749b4a4d5c64cb9971c0842ab58495d395e7e7763d7cf16f08df591c7",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1966",
+        "topic": "search",
+        "error_code": "NX-SEARCH-3108",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "f6cadba749b4a4d5c64cb9971c0842ab58495d395e7e7763d7cf16f08df591c7"
+      },
+      "text": "Ticket ID: SUP-1966\nCustomer Issue: Recently updated tickets not searchable\nError Code: NX-SEARCH-3108\nProduct Version: 4.8.1\nRoot Cause: Index worker stopped after deployment\nResolution: Restarted index worker and monitored backlog"
+    },
+    {
+      "chunk_number": 34,
+      "chunk_id": "bdaaf0a84e3acc173e85229bac77432c5889f3a848fa88020731920f8a217baf",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1972",
+        "topic": "notifications",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "bdaaf0a84e3acc173e85229bac77432c5889f3a848fa88020731920f8a217baf"
+      },
+      "text": "Ticket ID: SUP-1972\nCustomer Issue: Duplicate notifications reported by only one user\nProduct Version: 4.8.1\nRoot Cause: User subscribed directly and through escalation group\nResolution: Removed direct subscription"
+    },
+    {
+      "chunk_number": 35,
+      "chunk_id": "7eadddf6d49f6008d7f7e55c3be777e54f17b9aed8f308bd96620433d7a41028",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1978",
+        "topic": "webhooks",
+        "error_code": "",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "7eadddf6d49f6008d7f7e55c3be777e54f17b9aed8f308bd96620433d7a41028"
+      },
+      "text": "Ticket ID: SUP-1978\nCustomer Issue: Webhook 503 mentioned during September incident follow-up\nProduct Version: 4.8.1\nRoot Cause: Historical incident reference; current endpoint healthy\nResolution: Verified no active platform incident; no change required"
+    },
+    {
+      "chunk_number": 36,
+      "chunk_id": "b70fbbc6e7166769e968b23a89584d4edaa94bb2099a92c87c7c3d6ce30489e2",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1981",
+        "topic": "authentication",
+        "error_code": "NX-AUTH-4017",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "b70fbbc6e7166769e968b23a89584d4edaa94bb2099a92c87c7c3d6ce30489e2"
+      },
+      "text": "Ticket ID: SUP-1981\nCustomer Issue: Login fails after server restore\nError Code: NX-AUTH-4017\nProduct Version: 4.8.1\nRoot Cause: Server time drift after restore\nResolution: Enabled NTP and restarted authentication worker"
+    },
+    {
+      "chunk_number": 37,
+      "chunk_id": "4ad9d1d025147ad60bd2ff196e4a40a760b5c5160b57929ccab72104e654d2cc",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1982",
+        "topic": "api",
+        "error_code": "NX-API-4292",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "4ad9d1d025147ad60bd2ff196e4a40a760b5c5160b57929ccab72104e654d2cc"
+      },
+      "text": "Ticket ID: SUP-1982\nCustomer Issue: Partner gets HTTP 429\nError Code: NX-API-4292\nProduct Version: 4.8.1\nResolution: Reduced request rate and enabled backoff"
+    },
+    {
+      "chunk_number": 38,
+      "chunk_id": "3829774ba2bbe37d15a8c01f307d420c639358a9d713278bf76c197920cc30a2",
+      "metadata": {
+        "source": "tickets/resolved_support_tickets.csv",
+        "document_type": "support_ticket",
+        "ticket_id": "SUP-1983",
+        "topic": "webhooks",
+        "error_code": "NX-WEBHOOK-5031",
+        "status": "resolved",
+        "product_version": "4.8.1",
+        "chunk_id": "3829774ba2bbe37d15a8c01f307d420c639358a9d713278bf76c197920cc30a2"
+      },
+      "text": "Ticket ID: SUP-1983\nCustomer Issue: Webhook destination unavailable\nError Code: NX-WEBHOOK-5031\nProduct Version: 4.8.1\nRoot Cause: Destination returned HTTP 503\nResolution: Retried after endpoint recovery"
+    },
+    {
+      "chunk_number": 39,
+      "chunk_id": "8c9c16b2d3165d8b6b361bed18f0425b2ab9f61f1e761bc2f2d41f251c3be25d",
+      "metadata": {
+        "source": "troubleshooting/nexadesk_troubleshooting_manual.docx",
+        "document_type": "troubleshooting_manual",
+        "section_number": 1,
+        "section_title": "OAuth Authentication Failures",
+        "chunk_id": "8c9c16b2d3165d8b6b361bed18f0425b2ab9f61f1e761bc2f2d41f251c3be25d"
+      },
+      "text": "NexaDesk Cloud Troubleshooting Manual\nSynthetic support-engineering knowledge base | Applies primarily to NexaDesk 4.8.x\n\nOAuth Authentication Failures\n1. Confirm the token has not expired and inspect issuer and audience claims.\n2. Compare application-server time with the identity provider. A difference greater than five minutes can cause otherwise valid tokens to be rejected.\n3. If time drift is present, synchronize the host using NTP and restart the authentication worker.\n4. Only rotate OAuth credentials after token claims, time synchronization, and identity-provider configuration have been checked."
+    },
+    {
+      "chunk_number": 40,
+      "chunk_id": "cde66abff6c12b96efa70c643dd4eff6a3fba4327f5d51ba9ff8bc532c1a4d03",
+      "metadata": {
+        "source": "troubleshooting/nexadesk_troubleshooting_manual.docx",
+        "document_type": "troubleshooting_manual",
+        "section_number": 2,
+        "section_title": "HTTP 429 / API Throttling",
+        "chunk_id": "cde66abff6c12b96efa70c643dd4eff6a3fba4327f5d51ba9ff8bc532c1a4d03"
+      },
+      "text": "NexaDesk Cloud Troubleshooting Manual\nSynthetic support-engineering knowledge base | Applies primarily to NexaDesk 4.8.x\n\nHTTP 429 / API Throttling\n1. Measure requests per minute and concurrent workers for the affected tenant.\n2. Check Retry-After response headers where available.\n3. Reduce request concurrency and implement exponential backoff with jitter.\n4. Do not continuously retry at full speed; this can prolong throttling."
+    },
+    {
+      "chunk_number": 41,
+      "chunk_id": "6ba23f964830b0ea58f1b02892743e3d23685eaa61883525052a38abcdc019c0",
+      "metadata": {
+        "source": "troubleshooting/nexadesk_troubleshooting_manual.docx",
+        "document_type": "troubleshooting_manual",
+        "section_number": 3,
+        "section_title": "Webhook Delivery Failures",
+        "chunk_id": "6ba23f964830b0ea58f1b02892743e3d23685eaa61883525052a38abcdc019c0"
+      },
+      "text": "NexaDesk Cloud Troubleshooting Manual\nSynthetic support-engineering knowledge base | Applies primarily to NexaDesk 4.8.x\n\nWebhook Delivery Failures\n1. Confirm that the customer endpoint is reachable from the public internet.\n2. Verify DNS resolution, TLS certificate validity, firewall rules, and endpoint response time.\n3. For HTTP 503 responses, verify destination service health first.\n4. Inspect the NexaDesk webhook retry queue. Queue saturation across many tenants may indicate a platform-side incident."
+    },
+    {
+      "chunk_number": 42,
+      "chunk_id": "0ec4a4960ad8903e1510066b327da52d251246e7cd016cf6de18641d50bf4327",
+      "metadata": {
+        "source": "troubleshooting/nexadesk_troubleshooting_manual.docx",
+        "document_type": "troubleshooting_manual",
+        "section_number": 4,
+        "section_title": "Duplicate Ticket Notifications",
+        "chunk_id": "0ec4a4960ad8903e1510066b327da52d251246e7cd016cf6de18641d50bf4327"
+      },
+      "text": "NexaDesk Cloud Troubleshooting Manual\nSynthetic support-engineering knowledge base | Applies primarily to NexaDesk 4.8.x\n\nDuplicate Ticket Notifications\n1. Inspect notification rules for overlapping event conditions.\n2. Check whether the same user is subscribed through both an automation rule and a manual subscription.\n3. Review recent configuration changes before disabling the notification subsystem.\n4. After correcting the duplicate rule, trigger one controlled test ticket and confirm a single delivery."
+    },
+    {
+      "chunk_number": 43,
+      "chunk_id": "a40a90507d1110ba9fa1e7b61287e4df61da68557e16b56c3f9d454716a532b4",
+      "metadata": {
+        "source": "troubleshooting/nexadesk_troubleshooting_manual.docx",
+        "document_type": "troubleshooting_manual",
+        "section_number": 5,
+        "section_title": "Delayed Ticket Search",
+        "chunk_id": "a40a90507d1110ba9fa1e7b61287e4df61da68557e16b56c3f9d454716a532b4"
+      },
+      "text": "NexaDesk Cloud Troubleshooting Manual\nSynthetic support-engineering knowledge base | Applies primarily to NexaDesk 4.8.x\n\nDelayed Ticket Search\n1. Compare the ticket record in the transactional view with search results.\n2. Inspect search-index worker health and backlog.\n3. Restart a failed indexing worker if required. Rebuilding the entire index should be a last resort."
+    }
+  ]
+}

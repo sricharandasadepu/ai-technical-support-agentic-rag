@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     azure_storage_container_name: str
     pinecone_api_key: str
     pinecone_index_name: str
-
+    groq_api_key: str
+    groq_model: str = "llama-3.3-70b-versatile"
+    
     model_config = SettingsConfigDict(
         env_file=BACKEND_DIR / ".env",
         env_file_encoding="utf-8"
