@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     azure_storage_connection_string: str
     azure_storage_container_name: str
+    pinecone_api_key: str
+    pinecone_index_name: str
 
     model_config = SettingsConfigDict(
         env_file=BACKEND_DIR / ".env",
