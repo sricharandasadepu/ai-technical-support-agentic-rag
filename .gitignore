@@ -1,0 +1,45 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Local generated data
+backend/data/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local temporary scripts
+backend/test_azure.py
+
+# Frontend dependencies, builds and local tooling
+node_modules/
+frontend/dist/
+.npm-cache/
+*.tsbuildinfo
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
