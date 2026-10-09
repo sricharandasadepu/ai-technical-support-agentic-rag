@@ -1,14 +1,36 @@
-# Jupyter notebooks
-*.ipynb
-.ipynb_checkpoints/
+# Python bytecode
+__pycache__/
+*.py[cod]
 
-# Environment and secrets
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables and secrets
 .env
 .env.*
 !.env.example
 
-# Python cache
-__pycache__/
-*.pyc
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
 
-test_azure.py
+# Local generated data
+backend/data/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local temporary scripts
+backend/test_azure.py
