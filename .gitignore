@@ -34,3 +34,12 @@ Thumbs.db
 
 # Local temporary scripts
 backend/test_azure.py
+
+# Frontend dependencies, builds and local tooling
+node_modules/
+frontend/dist/
+.npm-cache/
+*.tsbuildinfo
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
