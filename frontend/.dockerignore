@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# Testing and coverage
+coverage/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker files not needed in build context
+docker-compose*.yml
+
+# Documentation
+README.md
