@@ -3,7 +3,8 @@ An end-to-end AI Technical Support Resolution Assistant powered by Agentic RAG, 
 
 The backend now includes a LangGraph workflow, authenticated chat, and MongoDB conversations.
 The existing authentication endpoints and Traditional RAG function remain available.
-No frontend, deployment, support-ticket creation, or additional paid service is included.
+A React frontend in `frontend/` integrates with the existing authentication, chat,
+and conversation APIs. Deployment and support-ticket creation are not included.
 
 ## Run the backend
 
@@ -297,3 +298,199 @@ were constructed without network calls. Python syntax checks passed. Pytest's te
 fixtures required access outside the Windows sandbox; the approved rerun passed.
 External calls and model inference remain separate live-service checks; the mocked
 suite does not claim successful Azure/Pinecone/Groq/MongoDB connectivity.
+
+## Run the frontend
+
+Keep the backend running in the existing `python_311` environment using the
+commands above. In a second PowerShell terminal, from the repository root:
+
+```powershell
+Set-Location frontend
+npm ci
+# Optional: copy .env.example to .env.local if you need to change its defaults.
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`. Register an account or sign in with an existing
+backend account. Registration returns to sign-in; the backend does not issue a
+token on registration. No demo account or mock mode is bundled into the app.
+
+The lockfile was installed and verified with Node **20.18.0** and npm **10.8.2**.
+Vite 6.4 and the TypeScript ESLint tooling are selected to support that existing
+Node version; do not upgrade Vite independently without checking its Node
+requirements. Frontend installation does not use or modify a Python environment.
+
+### Frontend environment
+
+`frontend/.env.example` contains public configuration only:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `VITE_API_BASE_URL` | `/api` | Browser API base URL |
+| `VITE_CHAT_TIMEOUT_MS` | `300000` | Timeout for normal HTTP chat responses, including first model initialization |
+| `API_PROXY_TARGET` | `http://127.0.0.1:8000` | Development-server proxy target; not exposed as a Vite browser variable |
+
+The Vite development server forwards `/api/*` to the existing backend and strips
+the `/api` prefix. Browser requests therefore use the same origin. No backend
+CORS, authentication, database, RAG, or dependency changes were needed.
+Read/authentication requests have a 30-second timeout. Restart Vite after changing
+environment configuration. `VITE_*` values are public and embedded at build time:
+never put backend keys, passwords, database credentials, or JWT signing secrets
+in them.
+
+### Frontend architecture
+
+```text
+frontend/
+  src/
+    app.tsx                    # Router, protected routes, query provider
+    auth/auth-context.tsx      # Session verification, expiration and logout
+    theme/theme-context.tsx    # Light, dark and system preference
+    lib/
+      contracts.ts             # Zod contracts derived from backend schemas
+      api.ts                   # Fetch client, bearer headers, cancellation, safe errors
+      session.ts               # Tab-scoped token storage and expiration helpers
+      utils.ts                 # Styling and timestamp helpers
+    pages/
+      auth-page.tsx            # Login and registration with RHF/Zod validation
+      chat-page.tsx            # New chat, stored history and continuation
+    components/
+      app-shell.tsx            # Sidebar, paginated conversations, mobile drawer, profile
+      composer.tsx             # Multiline input and processing state
+      chat-message.tsx         # Safe Markdown, code, citations, status and escalation
+      welcome.tsx              # Empty state and editable suggested questions
+      ui/                      # Reusable shadcn-style components with Radix primitives
+    test/                      # Isolated fixtures and test providers
+  e2e/workspace.spec.ts         # Desktop and mobile browser checks
+  components.json              # shadcn/ui configuration and aliases
+  .env.example
+  package.json
+  package-lock.json
+```
+
+The UI uses React/TypeScript, React Router, TanStack Query, React Hook Form/Zod,
+Tailwind CSS, Radix/shadcn-style components, Lucide icons, and React Markdown/GFM
+with syntax highlighting. Inter is self-hosted. Shared theme tokens provide
+neutral surfaces and restrained blue accents, visible focus states, reduced
+motion support, and responsive layouts. Chat and Markdown dependencies are split
+from the initial authentication view.
+
+The chat workspace follows a ChatGPT-style layout: a fixed 272px desktop sidebar
+collapses to a 76px rail, and mobile navigation opens in a drawer. The top bar
+contains NexaDesk AI branding, theme controls and the authenticated account menu.
+A centered welcome screen and an 880px maximum chat column share consistent
+spacing with the bottom composer. User messages align right, assistant responses
+align left, and only the history area scrolls. Light/dark themes use restrained
+blue accents; the composer respects mobile safe-area insets.
+
+Approved branding is extracted from `frontend/public/nexadesk-branding.png` into
+`frontend/public/branding/nexadesk-logo.png` (horizontal, 1912x536) and
+`nexadesk-icon.png` (square, 544x544). The assets have real PNG alpha transparency.
+Authentication and desktop headers use the horizontal logo; compact/mobile
+navigation, welcome graphics and assistant avatars use the standalone icon.
+32px/64px favicons and a 180px touch icon are derived from the same icon.
+The original shapes, typography and interior colors are retained; no CSS filters
+recolor the artwork. Light backing surfaces keep the navy detail visible in dark
+themes. The source file is retained.
+
+The supplied PNG has a baked-in neutral checkerboard. The reproducible Windows
+extraction script removes that matte and corrects its antialiased edge fringe,
+copies artwork at native resolution, and resamples only the smaller browser
+icons. It uses built-in System.Drawing and does not require new Python packages:
+
+```powershell
+# From frontend/, regenerate derived branding assets only.
+./scripts/extract-branding.ps1
+```
+
+The API integration uses the backend's JSON login body and bearer token, verifies
+the user through `/auth/me`, and preserves conversation IDs returned by
+`/rag/chat`. Conversation lists load 20 at a time; search filters currently loaded
+items. History requests 100 turns, matching the backend's current 100-turn limit,
+and continues the selected conversation. Change history loading if that backend
+limit is increased. Server timestamps are displayed in local time; newly returned
+chat messages temporarily use the receipt time until stored history is fetched.
+
+The frontend renders complete HTTP answers with a processing indicator; it does
+not simulate streaming. Returned statuses and escalation reasons are displayed.
+Source dialogs show exactly the returned citation, source filename, chunk ID and
+ticket ID, without invented document URLs or previews. Escalation does not create
+a support ticket. Conversation deletion and renaming are absent because the
+backend does not expose those operations.
+
+### Session and reliability behavior
+
+Tokens live in `sessionStorage`, with a memory fallback if storage is unavailable.
+They survive reload in the same tab and are not persisted in `localStorage`.
+JavaScript can access this storage, so an XSS vulnerability could still expose a
+token. `/auth/me` verifies a stored session; decoded JWT expiration only schedules
+client-side logout. Protected API 401/403 responses clear the session and user
+query cache and lead to sign-in. Invalid login credentials stay on the login form.
+There is no refresh-token flow or server-side token revocation endpoint: logout
+clears the local session, while an already copied token remains valid until expiry.
+Backend authentication and conversation ownership remain authoritative.
+
+Generated Markdown does not render raw HTML or automatically load remote images.
+Unsafe link schemes are disabled, and external links use `noopener noreferrer`.
+Requests carry no provider secrets; errors do not display raw internal exception
+details, and the frontend does not log tokens or credentials.
+
+Reads support cancellation; leaving a chat cancels its browser request. This does
+not guarantee server-side inference stops. Failed chat submissions keep the draft
+and can be retried explicitly. There are no automatic chat POST retries. If a
+request times out or loses its connection, refresh history before resending:
+the backend may have completed the turn, and there is no idempotency endpoint.
+A new conversation whose response was lost can be found through the list refresh.
+
+### Frontend verification
+
+From `frontend/`:
+
+```powershell
+npm run typecheck
+npm run lint
+npm run format:check
+npm test
+npm run build
+npm run test:e2e
+```
+
+Unit tests use Vitest and Testing Library. Browser tests build the production app
+and run it with Vite preview; Playwright uses installed Microsoft Edge on Windows.
+On another operating system, install Playwright Chromium with
+`npx playwright install chromium` before running browser tests. Screenshots and
+browser reports are written to gitignored test output directories.
+
+Tests cover authentication, validation, protected routing, expiration and logout,
+chat requests and errors, conversation restoration, citation inspection,
+Markdown safety, answer copying, escalation, theme persistence, keyboard behavior,
+and desktop/tablet/mobile layout, including sidebar collapse and a fixed composer
+while long history scrolls. Fixtures and intercepted API responses exist only in
+tests. These checks do not call live MongoDB, Pinecone or Groq services.
+
+Executed frontend verification: **30 unit tests passed** and **9 production-build
+browser tests passed** on desktop/tablet/mobile Edge, including a 320px mobile
+viewport. TypeScript, ESLint, formatting,
+and the production build passed. The build emits harmless third-party Zod comment
+annotation warnings; there are no oversized JavaScript chunk warnings.
+
+For manual live verification, start both servers, sign in, ask a known technical
+support question, inspect its returned sources, refresh and reopen the saved
+conversation, and send a follow-up. Check an insufficient-evidence response and
+session expiration with your real backend configuration. No live account was
+created or live RAG request submitted as part of frontend automated testing.
+
+### Production hosting
+
+`npm run build` writes static assets to `frontend/dist`. Serve those assets with
+SPA fallback to `index.html` for routes such as `/app/conversations/{id}`. Configure
+the hosting reverse proxy to forward `/api/*` to FastAPI with `/api` removed and
+allow enough time for chat initialization/inference. The development proxy is
+not included in the production build, and `vite preview` is a local smoke-test
+server rather than a production host. Use HTTPS for the browser and API.
+
+If deploying the frontend and backend on different origins, set the public API
+base URL at build time and configure explicit trusted frontend origins in the
+backend's CORS policy. That is a deployment-specific change and has not been
+added here. Verify deep-link refresh, login, chat and history through the final
+hosting proxy before publishing.
