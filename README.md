@@ -1,41 +1,205 @@
-# ai-technical-support-agentic-rag
-An end-to-end AI Technical Support Resolution Assistant powered by Agentic RAG, hybrid retrieval, reranking, and query correction to deliver accurate, context-aware, and grounded solutions from multi-format technical knowledge sources.
+# NexaDesk AI Technical Support Resolution Assistant
 
-The backend now includes a LangGraph workflow, authenticated chat, and MongoDB conversations.
-The existing authentication endpoints and Traditional RAG function remain available.
-A React frontend in `frontend/` integrates with the existing authentication, chat,
-and conversation APIs. Deployment and support-ticket creation are not included.
+Technical support teams often search across product documentation, known issues,
+release notes, and historical tickets to resolve a single incident. Relevant
+information can be scattered across formats, and a plausible answer without
+supporting evidence can lead to incorrect troubleshooting steps.
+
+NexaDesk AI brings that knowledge into an authenticated conversational workspace.
+Its LangGraph Agentic RAG workflow combines keyword and semantic retrieval,
+reranks the evidence, and checks whether it supports an answer. When evidence is
+insufficient, the workflow can rewrite the search query within a fixed retry
+budget; otherwise, it requests clarification or recommends escalation. Answers
+include numbered citations that users can inspect in the React interface.
+
+**Project status:** Completed portfolio project, successfully tested locally using
+Docker. The application has **not been publicly deployed**. This status reflects
+the project's reported local validation; automated tests use mocked services and
+are described separately below. Escalation recommends further support; it does
+not create a support ticket.
+
+## Key Features
+
+- **LangGraph Agentic RAG:** Structured intent routing and evidence grading guide retrieval, generation, clarification, and escalation.
+- **Hybrid retrieval:** BM25 keyword search and Pinecone dense vector search are combined using reciprocal rank fusion (RRF).
+- **Cross-encoder reranking:** Retrieved candidates are reordered with `cross-encoder/ms-marco-MiniLM-L-6-v2` before generation.
+- **Bounded query rewriting:** At most two rewritten searches follow the original search, with duplicate-query detection and a graph recursion limit.
+- **Grounded answers with citations:** Generation uses retrieved evidence and validates source identifiers; the UI exposes source metadata.
+- **JWT authentication:** Registration, login, bearer tokens, and Argon2 password hashing protect access.
+- **MongoDB conversation history:** Owner-scoped conversations support atomic turns, pagination, and follow-up questions.
+- **React frontend:** A responsive TypeScript chat workspace provides light/dark themes, Markdown answers, citation dialogs, and saved conversations.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    U[Browser] --> N["Nginx: React app on localhost:8080"]
+    N -->|/api requests| API[FastAPI backend]
+    API --> AUTH[JWT authentication]
+    AUTH --> DB[(MongoDB users and conversations)]
+    API --> GRAPH[LangGraph support workflow]
+    GRAPH --> HYBRID[Hybrid retrieval and RRF]
+    CORPUS[Verified local corpus snapshot] --> BM25[BM25 keyword search]
+    HYBRID --> BM25
+    HYBRID --> DENSE[MiniLM query embeddings]
+    DENSE --> PC[(Pinecone dense vectors)]
+    HYBRID --> RANK[Cross-encoder reranking]
+    RANK --> GRADE[Evidence sufficiency grading]
+    GRADE -->|Sufficient| ANSWER[Grounded answer with citations]
+    GRADE -->|Insufficient: up to two retries| REWRITE[Query rewrite]
+    REWRITE --> HYBRID
+    GRADE -->|Retry budget exhausted| ESC[Escalation recommendation]
+    GRAPH --> GROQ[Groq structured decisions and generation]
+    ANSWER --> DB
+    ESC --> DB
+    AZURE[Azure Blob source documents] -.-> INGEST[Explicit ingestion command]
+    INGEST -.-> CORPUS
+    INGEST -.->|Optional upsert| PC
+```
+
+Azure ingestion runs explicitly, outside the request path. On first chat, the
+backend verifies that the local corpus matches Pinecone before initializing
+shared retrieval resources. MongoDB must be reachable at application startup;
+the health endpoint does not prove that the RAG providers are ready.
+
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Backend | Python 3.11, FastAPI, Uvicorn, Pydantic / pydantic-settings |
+| Agent orchestration and LLM | LangGraph, LangChain Core, LangChain Groq, Groq (`llama-3.3-70b-versatile` by default) |
+| Retrieval and ranking | Pinecone, rank-bm25, SentenceTransformers, PyTorch; `all-MiniLM-L6-v2` embeddings (384 dimensions), MiniLM cross-encoder |
+| Knowledge ingestion | Azure Blob Storage, PyMuPDF, python-docx; TXT, Markdown, JSON, CSV, PDF, DOCX loaders |
+| Persistence and security | MongoDB via async PyMongo, PyJWT, pwdlib / Argon2 |
+| Frontend | React 19, TypeScript, Vite 6.4, Tailwind CSS 4, React Router, TanStack Query, Radix primitives, React Hook Form, Zod |
+| Local container setup | Docker Compose, Python 3.11 slim backend image, Node 20 build stage, Nginx frontend image |
+| Verification | pytest / pytest-asyncio, Vitest / Testing Library, Playwright, ESLint, Prettier |
+
+Exact direct backend pins are in `backend/requirements.txt`; frontend dependency
+ranges and resolved versions are in `frontend/package.json` and
+`frontend/package-lock.json`. The existing Traditional RAG function remains
+available alongside the agentic workflow.
+
+## Quick Start (recommended: Docker Compose)
+
+### Prerequisites
+
+Install Docker with the Compose plugin and start its engine. You also need a
+reachable MongoDB instance, Groq credentials, and an existing 384-dimensional
+Pinecone index whose `nexadesk-kb` namespace matches the checked-in corpus.
+Azure settings are required by configuration; Azure access is used when running
+explicit ingestion. Compose runs the backend and frontend only; it does not
+provision MongoDB, Azure, Pinecone, or Groq.
+
+### Environment setup
+
+From the repository root, copy the backend template **only if `backend/.env` does
+not already exist**:
+
+```sh
+cp backend/.env.example backend/.env
+```
+
+PowerShell equivalent:
+
+```powershell
+Copy-Item backend/.env.example backend/.env
+```
+
+Edit `backend/.env` locally using the template's variable names:
+
+| Variables | Required setup |
+|---|---|
+| `MONGODB_URI` | URI reachable from the backend container; use your MongoDB service's connection string. |
+| `JWT_SECRET_KEY`, `JWT_ALGORITHM` | Replace the placeholder with a long random signing secret; the default algorithm is `HS256`. |
+| `PINECONE_API_KEY`, `PINECONE_INDEX_NAME` | Credentials and name for your existing index; its corpus must pass the verification described below. |
+| `GROQ_API_KEY`, `GROQ_MODEL` | Your Groq key and available model; the template supplies the default model name. |
+| `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_STORAGE_CONTAINER_NAME` | Your Azure source configuration for explicit corpus ingestion. |
+| `APP_NAME`, `APP_VERSION`, `ENVIRONMENT` | Application metadata; retain template defaults for local use as appropriate. |
+
+The template's `mongodb://localhost:27017` addresses the **backend container**
+when used with Docker, so it must be changed for an external database. With
+Docker Desktop and MongoDB running on the host, a typical local URI is
+`mongodb://host.docker.internal:27017`, provided MongoDB accepts connections from
+Docker. On other setups, use a host address reachable from the container;
+`host.docker.internal` is not assumed to exist on every platform.
+
+Keep `.env` files private and never commit actual credentials. Do not place
+backend secrets in frontend configuration. Optional RAG settings and defaults
+are documented in [Configuration and dependencies](#configuration-and-dependencies).
+
+`frontend/.env.example` documents the public frontend and Vite development proxy
+settings. For manual frontend development, optionally copy it to
+`frontend/.env.local`. The supplied Docker build excludes `.env.*` files and uses
+the frontend's built-in `/api` and `300000` ms defaults; copying that template
+does not override the container build. Nginx already proxies `/api/` to FastAPI.
+
+### Build, run, and open the application
+
+```sh
+docker compose up --build -d
+docker compose ps
+```
+
+Open **[http://localhost:8080](http://localhost:8080)**, register an account, then
+sign in. The backend API documentation is available at
+[http://localhost:8000/docs](http://localhost:8000/docs), and its health endpoint
+at [http://localhost:8000/health](http://localhost:8000/health).
+
+Compose binds both ports to the local loopback interface and starts the frontend
+after the backend health check passes. The first chat may take longer while
+embedding and reranking models download and load; internet access is needed for
+uncached model files and provider requests. Docker rebuilds use the existing
+pinned dependencies, including the CPU-only PyTorch pin in `backend/Dockerfile`.
+
+```sh
+# Inspect startup or request failures.
+docker compose logs --tail=100 backend frontend
+# Stop and remove the application containers.
+docker compose down
+```
+
+MongoDB data lives in the separately configured database. The Compose file does
+not define persistent model-cache volumes, so recreating the backend container
+may require downloading models again. A healthy API with a failing first chat
+usually warrants checking Pinecone corpus alignment, provider configuration, and
+model availability.
+
+## Screenshots
+
+Actual application screenshots will be added here. These are placeholders, not
+rendered screenshots or evidence of functionality.
+
+| Application view | Placeholder |
+|---|---|
+| Registration / sign-in | Pending actual local application screenshot |
+| Chat workspace with a grounded answer | Pending actual local application screenshot |
+| Source citation dialog | Pending actual local application screenshot |
+| Saved conversation and dark theme | Pending actual local application screenshot |
+| Responsive mobile workspace | Pending actual local application screenshot |
 
 ## Run the backend
 
-Use the existing Conda environment `python_311` (Python 3.11.17). Do not create a
-new environment. Its interpreter is
-`C:\Users\sri charan\anaconda3\envs\python_311\python.exe`.
+For development outside Docker, use Python 3.11 and a virtual environment of
+your choice. Configure `backend/.env` as described above, with a MongoDB URI
+reachable from your host. From the repository root:
 
-From the repository root in PowerShell:
-
-```powershell
-conda activate python_311
-python -B -m pip check
-# If backend/.env does not exist, copy backend/.env.example and supply real values.
-# Keep an existing backend/.env; new optional settings already have defaults.
-Set-Location backend
-python -B -m uvicorn app.main:app --reload
+```sh
+python -m venv .venv
+# Activate on macOS/Linux:
+source .venv/bin/activate
+# On Windows PowerShell, use instead:
+# .\.venv\Scripts\Activate.ps1
+python -m pip install -r backend/requirements.txt
+python -m pip check
+cd backend
+python -m uvicorn app.main:app --reload
 ```
 
-If Conda activation is unavailable in the shell, invoke that interpreter directly:
-
-```powershell
-Set-Location backend
-& 'C:\Users\sri charan\anaconda3\envs\python_311\python.exe' -B -m uvicorn app.main:app --reload
-```
-
-All runtime requirements were already installed in this environment. Only the
-missing `watchfiles`, `pytest`, `pytest-asyncio`, `iniconfig`, and `pluggy` packages
-were installed for reload support and testing. No existing packages were upgraded.
-If these additions are missing on another machine with the same environment,
-install only those missing packages with its own Python executable; do not
-recreate the environment.
+The backend Dockerfile separately pins CPU-only PyTorch; manual installation
+uses SentenceTransformers' dependency resolution unless you install an
+appropriate PyTorch build yourself. For an existing compatible environment,
+activate it and check dependencies before installing requirements.
 
 Open `http://localhost:8000/docs`. Existing routes are `GET /health`,
 `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`.
@@ -241,11 +405,11 @@ responsive because blocking RAG work runs in a worker thread.
 
 `backend/requirements.txt` is the canonical dependency file; root `requirements.txt`
 delegates to it. LangGraph is added and the existing LangChain/Groq dependencies
-are pinned to the installed versions verified in `python_311`. Test requirements
+are pinned in the canonical requirements file. Test requirements
 are pinned separately. No checkpoint database or additional LLM service is
 required. These direct dependency pins are not a complete transitive lockfile.
-Check what is installed before installing any missing requirements; do not upgrade
-the existing Traditional RAG environment.
+Use an isolated environment for reproducible local development and avoid
+unrelated dependency upgrades.
 
 Existing settings remain intact. New optional variables are documented in
 `backend/.env.example`:
@@ -275,10 +439,10 @@ conversation ownership does not create per-tenant document authorization.
 
 ## Verification
 
-From the repository root using the existing environment:
+From the repository root, with your Python 3.11 environment activated:
 
 ```powershell
-conda activate python_311
+python -m pip install -r backend/requirements-test.txt
 python -B -m pip check
 python -B -m pytest -c backend/pytest.ini backend/tests -q
 ```
@@ -290,22 +454,23 @@ ownership/history/conflicts, resource reuse/recovery, snapshot validation, and
 Traditional RAG compatibility. Test settings explicitly replace service credentials
 with dummy values. No live Azure/Pinecone/Groq/MongoDB connection is required.
 
-Verification in `python_311`: **54 tests passed**. `pip check` reports no broken
-requirements. Backend imports, all 43 deterministic corpus IDs and a real BM25
-search were verified. SentenceTransformers, PyTorch, Azure Blob, PDF/DOCX and
-embedding/reranker module imports passed. Actual Groq structured-output adapters
-were constructed without network calls. Python syntax checks passed. Pytest's temporary-directory
-fixtures required access outside the Windows sandbox; the approved rerun passed.
+Previously reported backend verification: **54 tests passed**. The current test
+source defines **54 cases**, including parametrization. Earlier local checks also
+reported a clean `pip check`, valid deterministic IDs for all 43 corpus chunks,
+a real BM25 search, backend/model/loader imports, structured-output adapter
+construction without network calls, and Python syntax checks. These are recorded
+validation results, not a fresh test execution during this documentation review.
 External calls and model inference remain separate live-service checks; the mocked
-suite does not claim successful Azure/Pinecone/Groq/MongoDB connectivity.
+suite does not establish Azure/Pinecone/Groq/MongoDB connectivity.
 
 ## Run the frontend
 
-Keep the backend running in the existing `python_311` environment using the
-commands above. In a second PowerShell terminal, from the repository root:
+Keep the backend running using the manual development commands above. With
+Node.js satisfying `frontend/package.json` (`>=20.18.0`) and npm available, open
+a second terminal from the repository root:
 
-```powershell
-Set-Location frontend
+```sh
+cd frontend
 npm ci
 # Optional: copy .env.example to .env.local if you need to change its defaults.
 npm run dev
@@ -316,9 +481,9 @@ backend account. Registration returns to sign-in; the backend does not issue a
 token on registration. No demo account or mock mode is bundled into the app.
 
 The lockfile was installed and verified with Node **20.18.0** and npm **10.8.2**.
-Vite 6.4 and the TypeScript ESLint tooling are selected to support that existing
-Node version; do not upgrade Vite independently without checking its Node
-requirements. Frontend installation does not use or modify a Python environment.
+Vite 6.4 and the TypeScript ESLint tooling are compatible with that baseline.
+Check toolchain Node requirements before upgrading dependencies. Frontend
+installation does not use or modify a Python environment.
 
 ### Frontend environment
 
@@ -331,8 +496,8 @@ requirements. Frontend installation does not use or modify a Python environment.
 | `API_PROXY_TARGET` | `http://127.0.0.1:8000` | Development-server proxy target; not exposed as a Vite browser variable |
 
 The Vite development server forwards `/api/*` to the existing backend and strips
-the `/api` prefix. Browser requests therefore use the same origin. No backend
-CORS, authentication, database, RAG, or dependency changes were needed.
+the `/api` prefix. Browser requests therefore use the same origin. This setup
+works without a separate frontend CORS configuration.
 Read/authentication requests have a 30-second timeout. Restart Vite after changing
 environment configuration. `VITE_*` values are public and embedded at build time:
 never put backend keys, passwords, database credentials, or JWT signing secrets
@@ -383,7 +548,7 @@ spacing with the bottom composer. User messages align right, assistant responses
 align left, and only the history area scrolls. Light/dark themes use restrained
 blue accents; the composer respects mobile safe-area insets.
 
-Approved branding is extracted from `frontend/public/nexadesk-branding.png` into
+Project branding is extracted from `frontend/public/nexadesk-branding.png` into
 `frontend/public/branding/nexadesk-logo.png` (horizontal, 1912x536) and
 `nexadesk-icon.png` (square, 544x544). The assets have real PNG alpha transparency.
 Authentication and desktop headers use the horizontal logo; compact/mobile
@@ -393,10 +558,11 @@ The original shapes, typography and interior colors are retained; no CSS filters
 recolor the artwork. Light backing surfaces keep the navy detail visible in dark
 themes. The source file is retained.
 
-The supplied PNG has a baked-in neutral checkerboard. The reproducible Windows
+The supplied PNG has a baked-in neutral checkerboard. The optional Windows
 extraction script removes that matte and corrects its antialiased edge fringe,
 copies artwork at native resolution, and resamples only the smaller browser
-icons. It uses built-in System.Drawing and does not require new Python packages:
+icons. It uses Windows System.Drawing and does not require new Python packages.
+The generated assets are checked in; this script is not needed to run the app:
 
 ```powershell
 # From frontend/, regenerate derived branding assets only.
@@ -468,9 +634,11 @@ and desktop/tablet/mobile layout, including sidebar collapse and a fixed compose
 while long history scrolls. Fixtures and intercepted API responses exist only in
 tests. These checks do not call live MongoDB, Pinecone or Groq services.
 
-Executed frontend verification: **30 unit tests passed** and **9 production-build
+Previously reported frontend verification: **30 unit tests passed** and **9 production-build
 browser tests passed** on desktop/tablet/mobile Edge, including a 320px mobile
-viewport. TypeScript, ESLint, formatting,
+viewport. The current source defines 30 unit tests and three browser scenarios
+across three Playwright projects (nine cases). These results were not rerun
+during this documentation review. TypeScript, ESLint, formatting,
 and the production build passed. The build emits harmless third-party Zod comment
 annotation warnings; there are no oversized JavaScript chunk warnings.
 
@@ -481,6 +649,10 @@ session expiration with your real backend configuration. No live account was
 created or live RAG request submitted as part of frontend automated testing.
 
 ### Production hosting
+
+Public hosting has not been performed. The local Docker frontend already serves
+the production build through Nginx with SPA fallback and a 300-second API read
+timeout. The following notes describe requirements for a future public deployment.
 
 `npm run build` writes static assets to `frontend/dist`. Serve those assets with
 SPA fallback to `index.html` for routes such as `/app/conversations/{id}`. Configure
@@ -494,3 +666,14 @@ base URL at build time and configure explicit trusted frontend origins in the
 backend's CORS policy. That is a deployment-specific change and has not been
 added here. Verify deep-link refresh, login, chat and history through the final
 hosting proxy before publishing.
+
+## Future Improvements
+
+These are potential next steps, not implemented features:
+
+- Public deployment with HTTPS, managed secrets, and deployment validation.
+- Larger retrieval and answer-quality evaluation sets with regression reporting.
+- Tenant-aware knowledge-base authorization and role-based access controls.
+- Idempotent chat submissions and improved concurrency management.
+- Support-ticket integration for actionable escalation, plus conversation renaming and deletion.
+- OCR and table-aware ingestion for scanned PDFs and richer documents.
